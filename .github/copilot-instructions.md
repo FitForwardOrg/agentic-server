@@ -1,5 +1,15 @@
 # Copilot instructions (agentic-server)
 
+### Project context
+
+This project is a Python FastAPI service structured as a layered backend:
+
+* `src/api` — FastAPI endpoints and routing
+* `src/fine_tuner` — core business logic
+* `src/config` — configuration and settings
+* `tests/` — unit, integration, and functional tests
+* Documentation is generated with MkDocs
+
 ## Tech + style
 - Python 3.14, FastAPI, `uv` tooling, `pytest` tests, `ruff` for lint/format (`line-length = 120`, double quotes).
 - Prefer type hints everywhere; keep functions small and focused; use clear docstrings on public APIs/tools.

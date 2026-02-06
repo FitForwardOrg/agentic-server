@@ -1,58 +1,63 @@
+---
+applyTo: '**/test_*.py'
+---
 # How to write unit-tests
 
-unit-tests should be written in the `tests` directory.
+## Test organization
 
-## Structure
+* `tests/unit` → pure logic tests (no FastAPI server)
+* `tests/integration` → component interaction
+* `tests/functional` → end-to-end API behavior
+* `tests/api` → endpoint-focused tests
 
-* api handlers should be tested in the `tests/api` directory.
-* other services should be tested in the `tests/services` directory.
-* unit tests should follow Given-When-Then pattern.
-* unit tests should have descriptition explain the given/when/then.
-* test naming convetion:
-    * test_when_<condition>_then_<expected_result>
-    * test_given_<context>_when_<action>_then_<expected_result>
+Each test class should target **one feature or endpoint**.
 
-## Mocking
 
-* use `unittest.mock` for mocking.
-* mock only the dependencies of the unit under test.
-* avoid mocking the dependencies of the dependencies.
+## Test structure
 
-## Fixtures
+Tests should:
 
-* use `pytest` fixtures for common setup/teardown code.
-* fixtures should be defined in the `tests/conftest.py` file.
-* fixtures should be named descriptively.
+1. **Given** — prepare fixtures and mocks
+2. **When** — execute the action
+3. **Then** — assert results
 
-## Test examples:
+Use:
+
+* `pytest`
+* fixtures for setup
+* `unittest.mock.patch` for mocking dependencies
+* FastAPI test client for API tests
+
+### Example style (reference)
+
+Use this structure as a template:
 
 ```python
-from unittest.mock import patch
+def test_when_condition_then_expected_result(self, client, dependency):
+    # Given
+    with patch.object(dependency, "method", return_value=value):
 
+        # When
+        response = client.get("/endpoint")
 
-class TestHealthCheckEndpoint:
-    """
-    GET /api/health/alive  - service liveness probe
-    GET /api/health/ready - service readiness probe
-    """
-
-    def test_when_svc_is_started_then_is_alive_returns_200(self, client):
-        """liveness probe should return 200 OK"""
-        response = client.get("/api/health/alive")
+        # Then
         assert response.status_code == 200
-        assert response.json() == {"status": "alive"}
+        assert response.json() == {"status": "ok"}
+```
+## Testing guidelines (very important)
 
-    def test_when_all_deps_are_ready_then_is_ready_returns_200(self, client, resume_tuner):
-        """readiness probe should return 200 OK when all dependencies are ready"""
-        with patch.object(resume_tuner, "is_ready", return_value=True):
-            response = client.get("/api/health/ready")
-            assert response.status_code == 200
-            assert response.json() == {"status": "ready"}
+All tests must follow a **Given / When / Then** naming and structure.
 
-    def test_when_deps_are_not_ready_then_is_ready_returns_503(self, client, resume_tuner):
-        """readiness probe should return 503 Service Unavailable when dependencies are not ready"""
-        with patch.object(resume_tuner, "is_ready", return_value=False):
-            response = client.get("/api/health/ready")
-            assert response.status_code == 503
-            assert response.json() == {"status": "not ready"}
+### Naming convention
+
+Test methods must be named like:
+
+```
+test_when_<condition>_then_<expected_result>
+```
+
+Example:
+
+```
+test_when_deps_are_not_ready_then_is_ready_returns_503
 ```
