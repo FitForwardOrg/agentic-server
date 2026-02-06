@@ -20,6 +20,7 @@ jobs:
     name: Build & Push
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: dev
 
     steps:
       - name: Checkout
