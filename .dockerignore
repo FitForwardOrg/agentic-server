@@ -1,0 +1,16 @@
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+venv/
+.venv/
+.git/
+.gitignore
+Dockerfile
+Makefile
+README.md
+task.md
+mkdocs.yml
+docs/
+site/
