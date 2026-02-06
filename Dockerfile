@@ -21,6 +21,7 @@ ARG SKIP_TESTS=false
 ENV PYTHONPATH=/app:/app/src
 COPY src ./src
 COPY tests ./tests
+RUN uv run ruff check .
 RUN if [ "$SKIP_TESTS" != "true" ]; then pytest; else echo "Skipping tests..."; fi
 
 # Stage 4: Prod Builder

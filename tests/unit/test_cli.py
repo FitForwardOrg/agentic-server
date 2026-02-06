@@ -1,7 +1,9 @@
-from click.testing import CliRunner
-from src.main import main
-from src.config import settings
 import unittest.mock as mock
+
+from click.testing import CliRunner
+
+from src.config import settings
+from src.main import main
 
 
 def test_serve_reload_flag():
@@ -12,7 +14,7 @@ def test_serve_reload_flag():
 
     # We need to mock web.start() and factory() to avoid actually starting the server
     with (
-        mock.patch("src.main.factory") as mock_factory,
+        mock.patch("src.main.factory"),
         mock.patch("src.main.create_web_server") as mock_create_web_server,
     ):
         mock_web = mock.MagicMock()
