@@ -27,8 +27,12 @@ def main():
 
 
 @main.command()
-def serve():
+@click.option("--reload", is_flag=True, help="Enable auto-reload.")
+def serve(reload: bool):
     """Run the web server."""
+    if reload:
+        settings.debug = True
+
     app = factory(cfg=settings)
     web = create_web_server(app=app)
     web.start()

@@ -21,6 +21,14 @@ We use `.env` files for local development. A template is provided in `.env.examp
 | `HOST` | The host address to bind the server to | `0.0.0.0` |
 | `PORT` | The port to run the server on | `8000` |
 
+## CLI Flags
+
+Some settings can be overridden using CLI flags when running the `serve` command.
+
+| Flag | Description | Overwrites |
+|------|-------------|------------|
+| `--reload` | Enable auto-reload for development | `DEBUG` |
+
 ## Local Development
 
 1. Copy `.env.example` to `.env`:
