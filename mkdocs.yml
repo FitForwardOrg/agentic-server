@@ -29,9 +29,17 @@ markdown_extensions:
       alternate_style: true
   - toc:
       permalink: true
+  - mkdocs-click
 
 nav:
   - Home: index.md
-  - Guide: guide/index.md
-  - Architecture: architecture/index.md
+  - Guide:
+      - Overview: guide/index.md
+      - Getting Started: guide/getting_started.md
+      - Configuration: guide/configuration.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - Build & Versioning: architecture/build.md
+      - Code:
+          - CLI: architecture/code/cli.md
   - API Reference: api/index.md

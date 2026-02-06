@@ -2,14 +2,16 @@ import logging
 from typing import TYPE_CHECKING
 
 import uvicorn
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 
-from config import settings
+from src.api.errors import setup_exception_handlers
+from src.config import settings
 
 if TYPE_CHECKING:
     from src.fine_tuner import ResumeFineTuner
 
 logger = logging.getLogger(__name__)
+
 
 class WebServer:
     """
@@ -25,9 +27,10 @@ class WebServer:
             redoc_url=None,  # Disable Redoc
             openapi_url="/openapi.json",
         )
+        setup_exception_handlers(self.app)
 
     def add_router(self, router: APIRouter):
-        """ Add a router to the application."""
+        """Add a router to the application."""
         self.app.include_router(router)
 
     def is_ready(self) -> bool:

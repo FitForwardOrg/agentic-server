@@ -1,10 +1,22 @@
-import argparse
 import json
 from pathlib import Path
 
+import click
 from fastapi.openapi.utils import get_openapi
 
 from src.main import create_web_server
+
+
+def discover_tags() -> list[str]:
+    """Discover all unique tags used in the application routes."""
+    web = create_web_server(app=None)
+    app = web.app
+    tags = set()
+    for route in app.routes:
+        if hasattr(route, "tags"):
+            for tag in route.tags:
+                tags.add(tag)
+    return sorted(list(tags))
 
 
 def generate_schema(tags: list[str] | None = None, suffix: str | None = None):
@@ -25,10 +37,9 @@ def generate_schema(tags: list[str] | None = None, suffix: str | None = None):
         routes=routes,
         servers=[
             {"url": "http://localhost:8000", "description": "Local developer server"},
-        ]
+        ],
     )
 
-    # Output path assumed to be relative to project root when run via Makefile
     filename = f"openapi_{suffix}.json" if suffix else "openapi.json"
     output_path = Path("docs/specs") / filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -39,10 +50,18 @@ def generate_schema(tags: list[str] | None = None, suffix: str | None = None):
     print(f"Schema generated at {output_path}")
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate OpenAPI schema")
-    parser.add_argument("--tags", nargs="*", help="List of tags to filter routes by")
-    parser.add_argument("--suffix", help="Suffix for the output filename (openapi_{suffix}.json)")
+@click.command()
+@click.option(
+    "--tags",
+    multiple=True,
+    type=click.Choice(discover_tags(), case_sensitive=False),
+    help="List of tags to filter routes by.",
+)
+@click.option("--suffix", help="Suffix for the output filename (openapi_{suffix}.json).")
+def main(tags, suffix):
+    """Generate OpenAPI schema."""
+    generate_schema(tags=list(tags) if tags else None, suffix=suffix)
 
-    args = parser.parse_args()
-    generate_schema(tags=args.tags, suffix=args.suffix)
+
+if __name__ == "__main__":
+    main()

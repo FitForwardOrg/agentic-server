@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from src.api.health.models import StatusResponse
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class HealthHandler:
-    def __init__(self, server: WebServer):
+    def __init__(self, server: "WebServer"):
         self.server = server
         self.router = APIRouter(prefix="/api/health", tags=["Health"])
         self._register_routes()
@@ -46,7 +46,7 @@ class HealthHandler:
         """Liveness probe."""
         return StatusResponse(status="alive")
 
-    async def is_ready(self) -> StatusResponse:
+    async def is_ready(self) -> StatusResponse | JSONResponse:
         """Readiness probe."""
         if self.server.is_ready():
             return StatusResponse(status="ready")

@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from src.api import WebServer
 from src.api.health.handlers import HealthHandler
 from src.config import Settings
-from src.fine_tuner import Factory
+from src.fine_tuner import factory
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def settings(monkeypatch):
 
 @pytest.fixture
 def resume_tuner(settings):
-    return Factory(cfg=settings)
+    return factory(cfg=settings)
 
 
 @pytest.fixture

@@ -1,45 +1,26 @@
 .DEFAULT_GOAL := help
 
 # Get version information
-GIT_COMMIT := $(shell git rev-parse --short=10 HEAD)
-DESCRIBE := $(subst -, ,$(subst release/,,$(shell git describe --match 'release/*' --abbrev=10 --dirty=+m)))
+DATE := $(shell date +"%m%d%Y")
+GIT_HASH := $(shell git rev-parse --short=7 HEAD)
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+GIT_DIRTY := $(shell if [ -n "$$(git status --porcelain)" ]; then echo "-dirty"; fi)
 
-# Go through a nasty dance to determine whether we are on a dev/rc tag, which shifts the output
-# of `git describe` right by one because our tags can look like `release/1.2.3-dev1`.
-#
-# The field separator for `git describe` is '-' so dev/rc tags are harder to parse out.
-SUFFIX =
-ifeq ($(or $(findstring dev,$(word 2, $(DESCRIBE))),$(findstring rc,$(word 2, $(DESCRIBE)))),)
-# A standard release tag -- `git describe` does not contain dev or rc
-DELTA = 0
-ifneq ($(words $(DESCRIBE)),1)
-# We are 1+ commits past the tag
-DELTA = $(word 2, $(DESCRIBE))
-endif
+# Determine the version suffix based on the branch and dirty status
+ifeq ($(GIT_BRANCH),main)
+    VERSION_SUFFIX := $(GIT_DIRTY)
 else
-# A dev/rc release tag
-SUFFIX = -$(word 2, $(DESCRIBE))
-DELTA = 0
-ifneq ($(words $(DESCRIBE)),2)
-# We are 1+ commits past the tag
-DELTA = $(word 3, $(DESCRIBE))
-endif
+    VERSION_SUFFIX := -dev$(GIT_DIRTY)
 endif
 
-# Are there local, uncommitted changes at build time?
-DIRTY := $(subst +,-,$(findstring +m,$(lastword $(DESCRIBE))))
-
-# Set the RT (release train) component; will include dev or rc as appropriate
-RT := $(word 1, $(DESCRIBE))$(SUFFIX)
-
-ifeq ($(DELTA), 0)
-VERSION ?= $(RT)
-else
-VERSION ?= $(RT)-$(DELTA)-$(GIT_COMMIT)$(DIRTY)
-endif
+VERSION ?= $(DATE)-$(GIT_HASH)$(VERSION_SUFFIX)
 
 SKIP_TESTS ?= false
 
+
+.PHONY: version-print
+version-print: ## Prints the current version
+	@echo $(VERSION)
 
 .PHONY: install
 install: ## Installs dependencies
@@ -47,7 +28,7 @@ install: ## Installs dependencies
 
 .PHONY: doc
 doc: schema ## Builds documentation
-	uv run mkdocs build
+	PYTHONPATH=.:src uv run mkdocs build
 	@echo "Documentation built in site/"
 
 .PHONY: schema
@@ -56,7 +37,7 @@ schema: ## Generates OpenAPI schema
 
 .PHONY: serve-doc
 serve-doc: ## Serves documentation
-	uv run mkdocs serve --dev-addr 0.0.0.0:8080
+	PYTHONPATH=.:src uv run mkdocs serve --dev-addr 0.0.0.0:8080
 
 .PHONY: format
 format: ## Formats code
@@ -83,7 +64,7 @@ clean: ## Cleans up generated files
 
 .PHONY: run
 run: ## Runs the application locally with auto-reload
-	PYTHONPATH=. uv run ./src/main.py --serve
+	PYTHONPATH=. uv run ./src/main.py serve
 
 .PHONY: build
 build: ## Builds the Docker image
