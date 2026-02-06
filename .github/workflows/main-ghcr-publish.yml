@@ -52,6 +52,8 @@ jobs:
           tag="$(make version-print)"
           image="ghcr.io/${GITHUB_REPOSITORY,,}"
 
+          echo "Computed image name: ${image}:${tag}"
+
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
           echo "image=${image}" >> "${GITHUB_OUTPUT}"
 
