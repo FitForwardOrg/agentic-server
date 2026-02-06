@@ -14,6 +14,8 @@ else
 endif
 
 VERSION ?= $(DATE)-$(GIT_HASH)$(VERSION_SUFFIX)
+IMAGE ?= agentic-server
+TAG ?= latest
 
 SKIP_TESTS ?= false
 
@@ -72,11 +74,11 @@ build: ## Builds the Docker image
 		--build-arg COMMIT=$(GIT_COMMIT) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg SKIP_TESTS=$(SKIP_TESTS) \
-		-t agentic-server .
+		-t $(IMAGE):$(TAG) .
 
 .PHONY: run-docker
 run-docker: ## Runs the application in Docker
-	docker run -it -p 8000:8000 agentic-server
+	docker run -it -p 8000:8000 $(IMAGE):$(TAG)
 
 .PHONY: help
 help: ## Displays brief description of each build target
