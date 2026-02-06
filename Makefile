@@ -50,6 +50,11 @@ format: ## Formats code
 lint: ## Runs linter
 	uv run ruff check .
 
+.PHONY: hooks
+hooks: ## Installs git hooks (runs make lint on commit)
+	git config core.hooksPath .githooks
+	chmod +x .githooks/pre-commit
+
 .PHONY: test
 test: ## Runs tests
 	PYTHONPATH=.:src uv run pytest

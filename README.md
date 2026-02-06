@@ -18,3 +18,7 @@ AI-powered resume tailoring service built with Python 3.14 + FastAPI. Parses use
 
 - [Guide](./docs/guide/index.md): User guides and tutorials.
 - [Architecture](./docs/architecture/index.md): System architecture and design.
+
+## Development
+
+- Install git pre-commit hook: `make hooks`

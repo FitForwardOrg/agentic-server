@@ -2,10 +2,12 @@
 """
 console script, testing pdf converter
 """
-import click
-from pathlib import Path
+
 import glob
 import time
+from pathlib import Path
+
+import click
 
 
 def mk_doc_converter(source: str) -> tuple[str, float]:
@@ -32,8 +34,13 @@ def main():
 
 @main.command()
 @click.argument("pattern")
-@click.option("--output-dir", "-o", type=click.Path(file_okay=False), required=True,
-              help="Directory to save the converted markdown files.")
+@click.option(
+    "--output-dir",
+    "-o",
+    type=click.Path(file_okay=False),
+    required=True,
+    help="Directory to save the converted markdown files.",
+)
 def convert(pattern: str, output_dir: str):
     """Convert documents matching PATTERN to Markdown.
 
@@ -77,7 +84,7 @@ def convert(pattern: str, output_dir: str):
     app_total = time.time() - app_start
 
     click.echo("=" * 60)
-    click.echo(f"✨ Summary:")
+    click.echo("✨ Summary:")
     click.echo(f"  • Total files converted: {len(files)}")
     click.echo(f"  • Total conversion time: {total_conversion_time:.2f}s")
     click.echo(f"  • Average per document: {total_conversion_time / len(files):.2f}s")
