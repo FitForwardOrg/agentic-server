@@ -1,3 +1,32 @@
+# How to write unit-tests
+
+unit-tests should be written in the `tests` directory.
+
+## Structure
+
+* api handlers should be tested in the `tests/api` directory.
+* other services should be tested in the `tests/services` directory.
+* unit tests should follow Given-When-Then pattern.
+* unit tests should have descriptition explain the given/when/then.
+* test naming convetion:
+    * test_when_<condition>_then_<expected_result>
+    * test_given_<context>_when_<action>_then_<expected_result>
+
+## Mocking
+
+* use `unittest.mock` for mocking.
+* mock only the dependencies of the unit under test.
+* avoid mocking the dependencies of the dependencies.
+
+## Fixtures
+
+* use `pytest` fixtures for common setup/teardown code.
+* fixtures should be defined in the `tests/conftest.py` file.
+* fixtures should be named descriptively.
+
+## Test examples:
+
+```python
 from unittest.mock import patch
 
 
@@ -26,3 +55,4 @@ class TestHealthCheckEndpoint:
             response = client.get("/api/health/ready")
             assert response.status_code == 503
             assert response.json() == {"status": "not ready"}
+```
