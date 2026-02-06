@@ -45,28 +45,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.TOKEN_GITHUB_PACKAGE }}
 
-      - name: Compute version tag
-        id: version
+      - name: Compute image + tags
+        id: meta
+        shell: bash
         run: |
           tag="$(make version-print)"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+
           echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          echo "image=${image}" >> "${GITHUB_OUTPUT}"
 
       - name: Build image (version tag)
         env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          TAG: ${{ steps.version.outputs.tag }}
+          IMAGE: ${{ steps.meta.outputs.image }}
+          TAG: ${{ steps.meta.outputs.tag }}
         run: make build
 
       - name: Tag image as latest
         env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          TAG: ${{ steps.version.outputs.tag }}
+          IMAGE: ${{ steps.meta.outputs.image }}
+          TAG: ${{ steps.meta.outputs.tag }}
         run: docker tag "${IMAGE}:${TAG}" "${IMAGE}:latest"
 
       - name: Push image
         env:
-          IMAGE: ghcr.io/${{ github.repository }}
-          TAG: ${{ steps.version.outputs.tag }}
+          IMAGE: ${{ steps.meta.outputs.image }}
+          TAG: ${{ steps.meta.outputs.tag }}
         run: |
           docker push "${IMAGE}:${TAG}"
           docker push "${IMAGE}:latest"
