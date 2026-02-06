@@ -47,6 +47,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
   PORT=8000 \
   PYTHONPATH=/app:/app/src
 
+LABEL org.opencontainers.image.source https://github.com/FitForwardOrg/agentic-server
+
 # Copy installed packages from prod-builder
 COPY --from=prod-builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
 COPY --from=prod-builder /usr/local/bin /usr/local/bin

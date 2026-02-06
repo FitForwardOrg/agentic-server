@@ -2,7 +2,7 @@
 
 # Get version information
 DATE := $(shell date +"%m%d%Y")
-GIT_HASH := $(shell git rev-parse --short=7 HEAD)
+GIT_HASH := $(shell git rev-parse --short=7 HEAD 2>/dev/null || (echo "$$GITHUB_SHA" | cut -c1-7))
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_DIRTY := $(shell if [ -n "$$(git status --porcelain)" ]; then echo "-dirty"; fi)
 
@@ -71,7 +71,7 @@ run: ## Runs the application locally with auto-reload
 .PHONY: build
 build: ## Builds the Docker image
 	docker build \
-		--build-arg COMMIT=$(GIT_COMMIT) \
+		--build-arg COMMIT=$(GIT_HASH) \
 		--build-arg VERSION=$(VERSION) \
 		--build-arg SKIP_TESTS=$(SKIP_TESTS) \
 		-t $(IMAGE):$(TAG) .
