@@ -19,7 +19,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 # Install all dependencies (including dev)
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 COPY pyproject.toml uv.lock ./
-RUN uv export --frozen --dev --format requirements-txt --index https://download.pytorch.org/whl/cpu -o dev-requirements.txt
+RUN uv export --frozen --group dev --format requirements-txt --index https://download.pytorch.org/whl/cpu -o dev-requirements.txt
 RUN uv pip install --system --no-cache --index-url https://pypi.org/simple --extra-index-url https://download.pytorch.org/whl/cpu -r dev-requirements.txt
 
 # Stage 3: Tester
