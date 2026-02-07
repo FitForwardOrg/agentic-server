@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     libxcb1 \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -38,6 +39,14 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 COPY pyproject.toml uv.lock ./
 RUN uv export --frozen --format requirements-txt --index https://download.pytorch.org/whl/cpu -o requirements.txt
 RUN uv pip install --system --no-cache --index-url https://pypi.org/simple --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+
+# Clean up unnecessary files
+RUN find /usr/local/lib/python3.14 -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true \
+    && find /usr/local/lib/python3.14 -type f -name '*.pyc' -delete \
+    && find /usr/local/lib/python3.14 -type f -name '*.pyo' -delete \
+    && find /usr/local/lib/python3.14 -type d -name tests -exec rm -rf {} + 2>/dev/null || true \
+    && find /usr/local/lib/python3.14 -type d -name test -exec rm -rf {} + 2>/dev/null || true
+
 
 # Stage 5: Runtime
 FROM base AS runtime
