@@ -38,3 +38,15 @@ jobs:
 
       - name: Unit tests
         run: make test
+
+      - name: Check changed files
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            deps:
+              - 'uv.lock'
+
+      - name: Build image
+        if: steps.changes.outputs.deps == 'true'
+        run: make build

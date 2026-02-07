@@ -1,5 +1,12 @@
 # Stage 1: Base
-FROM python:3.14.3-alpine AS base
+FROM python:3.14.3-slim-bookworm AS base
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libgl1 \
+    libglib2.0-0 \
+    libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -47,7 +54,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
   PORT=8000 \
   PYTHONPATH=/app:/app/src
 
-LABEL org.opencontainers.image.source https://github.com/FitForwardOrg/agentic-server
+LABEL org.opencontainers.image.source=https://github.com/FitForwardOrg/agentic-server
 
 # Copy installed packages from prod-builder
 COPY --from=prod-builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
@@ -58,7 +65,15 @@ COPY --from=prod-builder /usr/local/bin /usr/local/bin
 COPY --from=tester /app/src ./src
 
 # Create a non-root user
-RUN adduser -D -u 1000 appuser && chown -R appuser /app
+RUN useradd --create-home --uid 1000 appuser && chown -R appuser:appuser /app
+
+# Ensure appuser can write to rapidocr models directory
+# and other potential model cache directories
+RUN mkdir -p /usr/local/lib/python3.14/site-packages/rapidocr/models && \
+    chown -R appuser:appuser /usr/local/lib/python3.14/site-packages/rapidocr/models && \
+    mkdir -p /home/appuser/.cache && \
+    chown -R appuser:appuser /home/appuser/.cache
+
 USER appuser
 
 # Healthcheck

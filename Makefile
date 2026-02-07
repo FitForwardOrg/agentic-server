@@ -81,9 +81,13 @@ build: ## Builds the Docker image
 		--build-arg SKIP_TESTS=$(SKIP_TESTS) \
 		-t $(IMAGE):$(TAG) .
 
-.PHONY: run-docker
+.PHONY: docker-run
 run-docker: ## Runs the application in Docker
 	docker run -it -p 8000:8000 $(IMAGE):$(TAG)
+
+.PHONY: docker-shell
+docker-shell: ## Starts a shell inside the Docker container with the root directory mounted
+	docker run -it --rm -v $(PWD):/app $(IMAGE):$(TAG) /bin/bash
 
 .PHONY: help
 help: ## Displays brief description of each build target
