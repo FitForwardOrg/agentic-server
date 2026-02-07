@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 
 # Get version information
-DATE := $(shell date +"%m%d%Y")
+DATE := $(shell date +"%Y.%m.%d")
 GIT_HASH := $(shell git rev-parse --short=7 HEAD 2>/dev/null || (echo "$$GITHUB_SHA" | cut -c1-7))
 GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 GIT_DIRTY := $(shell if [ -n "$$(git status --porcelain)" ]; then echo "-dirty"; fi)
@@ -81,9 +81,13 @@ build: ## Builds the Docker image
 		--build-arg SKIP_TESTS=$(SKIP_TESTS) \
 		-t $(IMAGE):$(TAG) .
 
-.PHONY: run-docker
+.PHONY: docker-run
 run-docker: ## Runs the application in Docker
 	docker run -it -p 8000:8000 $(IMAGE):$(TAG)
+
+.PHONY: docker-shell
+docker-shell: ## Starts a shell inside the Docker container with the root directory mounted
+	docker run -it --rm -v $(PWD):/app $(IMAGE):$(TAG) /bin/bash
 
 .PHONY: help
 help: ## Displays brief description of each build target
