@@ -47,9 +47,6 @@ jobs:
             deps:
               - 'uv.lock'
 
-      - name: Clean uv cache
-        run: uv cache clean
-
       - name: Build image
         if: steps.changes.outputs.deps == 'true'
         run: make build
