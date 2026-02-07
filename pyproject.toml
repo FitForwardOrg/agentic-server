@@ -47,3 +47,16 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+torchaudio = [{ index = "pytorch-cpu" }]  # If used by docling
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
